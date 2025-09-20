@@ -1,0 +1,171 @@
+/* 🌟 Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🌗 Dark Theme (Default) */
+:root {
+  --accent1: #6a5acd;
+  --accent2: #00c9a7;
+  --muted: #a9a9a9;
+  --bg: #0f1117;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --text: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+/* 🌞 Light Theme */
+.light-theme {
+  --bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #666;
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* 🎴 Card Component */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px var(--shadow);
+}
+
+/* 🔘 Button */
+.btn {
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  color: white;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.4s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 16px var(--shadow);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+/*  Tabs */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.tabs button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  transition: 0.3s ease;
+}
+
+.light-theme .tabs button {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.tabs button.active {
+  background: linear-gradient(90deg, var(--accent2), var(--accent3));
+  color: white;
+}
+
+/* 📝 Inputs & Forms */
+input, textarea, select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+}
+
+.light-theme input,
+.light-theme textarea,
+.light-theme select {
+  color: var(--text);
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+input:focus, textarea:focus, select:focus {
+  border: 1px solid var(--accent2);
+  box-shadow: 0 0 10px var(--accent2);
+}
+
+/* 🔔 Notification Badge */
+.badge {
+  display: inline-block;
+  background: var(--accent3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* 📊 Charts Container */
+.chart-container {
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--card-bg);
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: background 0.4s ease;
+}
+
+/* ✨ Smooth Animations */
+.fade-in {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🌗 Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--card-bg);
+  padding: 0.7rem;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 6px 16px var(--shadow);
+  transition: background 0.4s ease, transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
