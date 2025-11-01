@@ -1,18 +1,85 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom"; 
 
 export default function MissionCard({
   title,
   desc,
-  badge,
   points,
-  progress = null,
-  image = "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
-  category = "Environment",
-  deadline = "30 Sept 2025",
-  type = "Team", 
+  difficulty,
+  category = "environment",
+  missionId,
+  userRole = "student",
+  isActive = true,
+  image = null,
+  deadline = null,
+  submissionsCount = 0
 }) {
+  const navigate = useNavigate();
+
+  // Category icons mapping
+  const categoryIcons = {
+    environment: "🌱",
+    coding: "💻", 
+    math: "📐",
+    science: "🔬",
+    language: "📚",
+    creative: "🎨",
+    recycling: "♻️",
+    energy: "💡",
+    default: "🎯"
+  };
+
+  // Difficulty colors
+  const difficultyColors = {
+    easy: "limegreen",
+    medium: "orange", 
+    hard: "crimson"
+  };
+
+  // Difficulty labels
+  const difficultyLabels = {
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard"
+  };
+
+  // Default images based on category
+  const defaultImages = {
+    environment: "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+    coding: "https://cdn-icons-png.flaticon.com/512/1006/1006363.png",
+    math: "https://cdn-icons-png.flaticon.com/512/2103/2103795.png",
+    science: "https://cdn-icons-png.flaticon.com/512/684/684809.png",
+    language: "https://cdn-icons-png.flaticon.com/512/3898/3898082.png",
+    creative: "https://cdn-icons-png.flaticon.com/512/1055/1055666.png",
+    recycling: "https://cdn-icons-png.flaticon.com/512/1055/1055666.png",
+    energy: "https://cdn-icons-png.flaticon.com/512/993/993734.png",
+    default: "https://cdn-icons-png.flaticon.com/512/3062/3062634.png"
+  };
+
+  // ✅ SIMPLE CLICK HANDLER - Direct submit page
+  const handleCardClick = () => {
+    navigate(`/mission/${missionId}/submit`);
+  };
+
+  const getCategoryDisplay = (cat) => {
+    const categoryMap = {
+      environment: "Environment",
+      coding: "Coding",
+      math: "Mathematics", 
+      science: "Science",
+      language: "Language",
+      creative: "Creative",
+      recycling: "Recycling",
+      energy: "Energy"
+    };
+    return categoryMap[cat] || cat;
+  };
+
+  const getMissionImage = () => {
+    return image || defaultImages[category] || defaultImages.default;
+  };
+
   return (
     <motion.div
       whileHover={{ y: -8, scale: 1.02 }}
@@ -21,23 +88,46 @@ export default function MissionCard({
       style={{
         padding: "1.5rem",
         borderRadius: "var(--radius)",
-        background: "rgba(255,255,255,0.06)",
+        background: isActive ? "rgba(255,255,255,0.06)" : "rgba(128,128,128,0.1)",
         backdropFilter: "blur(12px)",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
-        cursor: "pointer",
+        boxShadow: isActive ? "0 6px 18px rgba(0,0,0,0.25)" : "0 4px 12px rgba(128,128,128,0.2)",
+        cursor: isActive ? "pointer" : "not-allowed",
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        border: isActive ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(128,128,128,0.3)",
+        opacity: isActive ? 1 : 0.7,
+        position: "relative"
       }}
+      onClick={isActive ? handleCardClick : undefined}
     >
+      {/* Inactive Overlay */}
+      {!isActive && (
+        <div style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          background: "rgba(255,0,0,0.8)",
+          color: "white",
+          padding: "0.3rem 0.6rem",
+          borderRadius: "12px",
+          fontSize: "0.7rem",
+          fontWeight: "bold",
+          zIndex: 2
+        }}>
+          INACTIVE
+        </div>
+      )}
+
       {/* Thumbnail */}
       <img
-        src={image}
+        src={getMissionImage()}
         alt="mission"
         style={{
           width: "70px",
           marginBottom: "1rem",
-          filter: "drop-shadow(0 0 10px rgba(0,0,0,0.3))",
+          filter: isActive ? "drop-shadow(0 0 10px rgba(0,0,0,0.3))" : "grayscale(100%)",
+          opacity: isActive ? 1 : 0.5
         }}
       />
 
@@ -54,7 +144,7 @@ export default function MissionCard({
           marginBottom: "0.6rem",
         }}
       >
-        📂 {category}
+        {categoryIcons[category] || categoryIcons.default} {getCategoryDisplay(category)}
       </span>
 
       {/* Title */}
@@ -62,8 +152,9 @@ export default function MissionCard({
         style={{
           fontSize: "1.2rem",
           fontWeight: "700",
-          background:
-            "linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3))",
+          background: isActive 
+            ? "linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3))"
+            : "linear-gradient(90deg,gray,darkgray)",
           WebkitBackgroundClip: "text",
           color: "transparent",
           marginBottom: "0.5rem",
@@ -75,7 +166,7 @@ export default function MissionCard({
       {/* Description */}
       <p
         style={{
-          color: "var(--muted)",
+          color: isActive ? "var(--muted)" : "gray",
           fontSize: "0.95rem",
           lineHeight: "1.5rem",
           flexGrow: 1,
@@ -84,7 +175,7 @@ export default function MissionCard({
         {desc}
       </p>
 
-      {/* Badge + XP + Type */}
+      {/* Difficulty + XP */}
       <div
         style={{
           display: "flex",
@@ -97,106 +188,71 @@ export default function MissionCard({
         <span
           style={{
             fontSize: "0.85rem",
-            background: "rgba(255,255,255,0.1)",
+            background: `rgba(${difficultyColors[difficulty] || 'var(--accent2)'}, 0.2)`,
             padding: "0.35rem 0.8rem",
             borderRadius: "20px",
-            color: "var(--accent2)",
+            color: difficultyColors[difficulty] || "var(--accent2)",
             fontWeight: "600",
+            border: `1px solid ${difficultyColors[difficulty] || 'var(--accent2)'}`
           }}
         >
-          🏅 {badge}
+          ⚡ {difficultyLabels[difficulty] || difficulty}
         </span>
+
         <span
           style={{
             fontSize: "0.9rem",
             fontWeight: "700",
-            color: "var(--accent3)",
+            color: isActive ? "var(--accent3)" : "gray",
           }}
         >
           ⭐ {points} XP
         </span>
-        <span
-          style={{
-            fontSize: "0.85rem",
-            background: "rgba(255,255,255,0.15)",
-            padding: "0.3rem 0.7rem",
-            borderRadius: "20px",
-            color: "white",
-          }}
-        >
-          {type === "Team" ? "👥 Team Mission" : "🧑 Solo Mission"}
-        </span>
       </div>
 
-      {/* Deadline */}
-      <p
+      {/* Action Button */}
+      <motion.button
+        whileHover={isActive ? { scale: 1.05 } : {}}
+        whileTap={isActive ? { scale: 0.95 } : {}}
         style={{
-          marginTop: "0.8rem",
-          fontSize: "0.85rem",
-          color: "orange",
+          marginTop: "1rem",
+          padding: "0.6rem 1rem",
+          border: "none",
+          borderRadius: "8px",
+          background: isActive 
+            ? "linear-gradient(90deg,var(--accent1),var(--accent2))"
+            : "linear-gradient(90deg,gray,darkgray)",
+          color: "white",
           fontWeight: "600",
+          cursor: isActive ? "pointer" : "not-allowed",
+          width: "100%",
+          opacity: isActive ? 1 : 0.6
         }}
+        onClick={isActive ? handleCardClick : undefined}
       >
-        ⏳ Due: {deadline}
-      </p>
+        {isActive ? "🚀 Submit Mission" : "❌ Mission Inactive"}
+      </motion.button>
 
-      {/* Progress Bar */}
-      {progress !== null && (
-        <div style={{ marginTop: "0.8rem" }}>
-          <div
-            style={{
-              background: "rgba(255,255,255,0.1)",
-              borderRadius: "8px",
-              height: "8px",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8 }}
-              style={{
-                height: "100%",
-                background:
-                  "linear-gradient(90deg,var(--accent1),var(--accent2))",
-                borderRadius: "8px",
-              }}
-            />
-          </div>
-          <p
-            style={{
-              fontSize: "0.8rem",
-              marginTop: "0.3rem",
-              textAlign: "right",
-              color: "var(--muted)",
-            }}
-          >
-            {progress}% Complete
+      {/* Click Info */}
+      {isActive && (
+        <div style={{
+          marginTop: "0.8rem",
+          padding: "0.5rem",
+          background: "rgba(0,255,0,0.1)",
+          border: "1px solid rgba(0,255,0,0.2)",
+          borderRadius: "8px",
+          textAlign: "center"
+        }}>
+          <p style={{
+            margin: 0,
+            fontSize: "0.8rem",
+            color: "limegreen",
+            fontWeight: "600"
+          }}>
+            Click to submit and earn {points} XP!
           </p>
         </div>
       )}
-
-      {/* Join Button */}
-      <Link to="/submit-mission" style={{ textDecoration: "none" }}>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            marginTop: "1rem",
-            padding: "0.6rem 1rem",
-            border: "none",
-            borderRadius: "8px",
-            background: "linear-gradient(90deg,var(--accent1),var(--accent2))",
-            color: "white",
-            fontWeight: "600",
-            cursor: "pointer",
-            width: "100%",
-          }}
-        >
-          🚀 Join Mission
-        </motion.button>
-      </Link>
     </motion.div>
   );
 }

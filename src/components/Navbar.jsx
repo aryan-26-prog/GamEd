@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBell } from "react-icons/fa";
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
-
-  // Determine what buttons to show
-  const showLoginButton = location.pathname === "/";
-  const showAllButtons = location.pathname !== "/" && location.pathname !== "/auth";
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Sample notifications
   const [notifications, setNotifications] = useState([
@@ -18,11 +17,79 @@ export default function Navbar() {
     { id: 3, text: "🏆 Leaderboard updated, your class is #1!", read: false },
   ]);
 
+  // Check if user is logged in
+  useEffect(() => {
+    checkAuth();
+  }, [location]);
+
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        setUser(JSON.parse(userData));
+        
+        // Optional: Verify token with backend
+        try {
+          const response = await fetch('http://localhost:5000/api/auth/me', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+          } else {
+            // Token invalid, logout user
+            logout();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
+    window.location.reload(); // Refresh to update state
+  };
+
   const markAsRead = (id) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   };
+
+  // Determine what buttons to show
+  const showLoginButton = location.pathname === "/" && !user;
+  const showAuthButtons = location.pathname !== "/auth" && !user;
+  const showUserButtons = user;
+
+  // Get user display info
+  const getUserDisplayInfo = () => {
+    if (!user) return null;
+    
+    return {
+      name: user.name || 'User',
+      points: user.points || 0,
+      level: user.level || 1,
+      role: user.role || 'student',
+      initial: user.name ? user.name.charAt(0).toUpperCase() : 'U'
+    };
+  };
+
+  const userInfo = getUserDisplayInfo();
 
   return (
     <nav
@@ -39,7 +106,7 @@ export default function Navbar() {
     >
       {/* Logo */}
       <Link
-        to="/"
+        to={user ? "/home" : "/"}
         style={{
           display: "flex",
           alignItems: "center",
@@ -69,7 +136,7 @@ export default function Navbar() {
 
       {/* Buttons */}
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        {/* Landing page → only Login */}
+        {/* Landing page → only Login when no user */}
         {showLoginButton && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -82,29 +149,87 @@ export default function Navbar() {
           </motion.div>
         )}
 
-        {/* Auth page → no buttons */}
-        {showAllButtons && (
+        {/* Show auth buttons when not logged in */}
+        {showAuthButtons && location.pathname !== "/" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <Link to="/auth">
+              <button className="btn">Login / Register</button>
+            </Link>
+          </motion.div>
+        )}
+
+        {/* User is logged in - show all buttons */}
+        {showUserButtons && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
-            {/* Profile → Teacher → Student → Rewards → Bell */}
+            {/* User Info */}
+            <motion.div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                background: "rgba(255,255,255,0.1)",
+                padding: "0.5rem 1rem",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,255,255,0.1)"
+              }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, var(--accent2), var(--accent1))",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                  fontSize: "14px"
+                }}
+              >
+                {userInfo?.initial}
+              </div>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>
+                  {userInfo?.name}
+                </div>
+                <div style={{ fontSize: "0.7rem", color: "var(--muted)" }}>
+                  Lvl {userInfo?.level} • {userInfo?.points} pts
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Navigation Buttons based on role */}
             <Link to="/profile">
-              <button className="btn">Profile</button>
+              <button className="btn" style={{ padding: "0.5rem 1rem" }}>Profile</button>
             </Link>
-            <Link to="/dashboard">
-              <button className="btn">Teacher Dashboard</button>
-            </Link>
+
+            {(user.role === 'teacher' || user.role === 'admin') && (
+              <Link to="/dashboard">
+                <button className="btn" style={{ padding: "0.5rem 1rem" }}>Teacher Dashboard</button>
+              </Link>
+            )}
+
             <Link to="/students">
-              <button className="btn">Student Dashboard</button>
+              <button className="btn" style={{ padding: "0.5rem 1rem" }}>Student Dashboard</button>
             </Link>
+
             <Link to="/rewards">
-              <button className="btn">Rewards</button>
+              <button className="btn" style={{ padding: "0.5rem 1rem" }}>Rewards</button>
             </Link>
+
             <Link to="/games">
-              <button className="btn">Games</button>
+              <button className="btn" style={{ padding: "0.5rem 1rem" }}>Games</button>
             </Link>
 
             {/* Notifications Bell */}
@@ -198,7 +323,31 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Logout Button */}
+            <motion.button
+              className="btn"
+              onClick={logout}
+              style={{ 
+                padding: "0.5rem 1rem",
+                background: "rgba(255,0,0,0.2)",
+                border: "1px solid rgba(255,0,0,0.3)"
+              }}
+              whileHover={{ 
+                scale: 1.05,
+                background: "rgba(255,0,0,0.3)"
+              }}
+            >
+              Logout
+            </motion.button>
           </motion.div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div style={{ color: "var(--muted)", fontSize: "0.9rem" }}>
+            Loading...
+          </div>
         )}
       </div>
     </nav>

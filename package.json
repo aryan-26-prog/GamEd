@@ -11,10 +11,17 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",
-    "axios": "^1.12.0",
+    "axios": "^1.12.2",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "framer-motion": "^12.23.12",
+    "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.2",
     "jwt-decode": "^4.0.0",
+    "mongoose": "^8.19.1",
+    "multer": "^2.0.2",
     "react": "^19.1.1",
     "react-confetti": "^6.4.0",
     "react-dom": "^19.1.1",
@@ -32,6 +39,20 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "nodemon": "^3.1.10",
     "vite": "^7.1.2"
-  }
+  },
+  "description": "<<<<<<< HEAD\r # SIH2025\r =======\r # React + Vite",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aryan-26-prog/SIH2025.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aryan-26-prog/SIH2025/issues"
+  },
+  "homepage": "https://github.com/aryan-26-prog/SIH2025#readme"
 }

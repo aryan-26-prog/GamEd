@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Components
@@ -7,7 +7,6 @@ import AnimatedBackground from "./components/AnimatedBackground";
 import FloatingIcons from "./components/FloatingIcons";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
 
 // Pages
 import Landing from "./pages/Landing";
@@ -25,7 +24,6 @@ import Rewards from "./pages/Reward";
 import DailyQuiz from "./pages/DailyQuiz";
 import ThemeToggle from "./pages/ThemeToggle";
 import Games from "./pages/Games";
-
 
 // Main App component
 export default function App() {
@@ -49,9 +47,8 @@ function AppContent() {
       {/* Navbar (common for all pages) */}
       <Navbar />
 
-      {/* Navbar (common for all pages) */}
+      {/* Theme Toggle */}
       <ThemeToggle />
-      
 
       {/* Animated Routes */}
       <AnimatePresence mode="wait" initial={false}>
@@ -120,14 +117,17 @@ function AppContent() {
               </PageWrapper>
             }
           />
+          
+          {/* ✅ FIXED MISSION ROUTE - Direct submit page */}
           <Route
-            path="/submit-mission"
+            path="/mission/:id/submit"
             element={
               <PageWrapper>
                 <MissionSubmission />
               </PageWrapper>
             }
           />
+          
           <Route
             path="/notifications"
             element={
@@ -144,7 +144,7 @@ function AppContent() {
               </PageWrapper>
             }
           />
-           <Route
+          <Route
             path="/rewards"
             element={
               <PageWrapper>
@@ -169,7 +169,6 @@ function AppContent() {
             }
           />
         </Routes>
-
       </AnimatePresence>
 
       {/* Footer */}
@@ -178,19 +177,17 @@ function AppContent() {
   );
 }
 
-
-
 // ✅ PageWrapper with Scroll-Top + Top-to-Bottom Animation
 function PageWrapper({ children }) {
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" }); // scroll top on page load
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -50 }} // Start slightly above top
-      animate={{ opacity: 1, y: 0 }}  // Animate down to normal position
-      exit={{ opacity: 0, y: 50 }}    // Exit moves slightly down
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 50 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
       style={{ minHeight: "100vh" }}
     >
