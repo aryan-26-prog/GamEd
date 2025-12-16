@@ -2,7 +2,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Prototype-success?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/AI-Powered-blueviolet?style=for-the-badge" />
   <img src="https://img.shields.io/badge/NEP%202020-Aligned-green?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Hackathon-Ready-orange?style=for-the-badge" />
 </p>
@@ -90,11 +89,6 @@ A **gamified + AI-driven ecosystem** where students:
 
 ### Database
 - MongoDB  
-
-### AI & Analytics (Python)
-- TensorFlow – adaptive learning  
-- Scikit-learn – student analytics  
-- Pandas & Matplotlib – data visualization  
 
 ---
 
